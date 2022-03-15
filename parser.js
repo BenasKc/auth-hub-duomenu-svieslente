@@ -52,11 +52,10 @@ function check_login(name, pass, option){
     else if(option === 'email')option = 2;
     else if(option === 'id')option = 3;
     var l = find_attr(name, option);
-    console.log(l);
     if(l == -1)return 0;
     var hash = crypto.pbkdf2Sync(pass,  
-        l[4], 1000, 64, `sha512`).toString(`hex`); 
-        return l[1] === pass; 
+        l[4], 1000, 64, `sha512`).toString(`hex`);
+    return l[1] === hash; 
 }
-var l = check_login('BenasKc', 'Benas123', 'name');
-console.log(l);
+exports.check_login = check_login;
+exports.create_acc = create_acc;
