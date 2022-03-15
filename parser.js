@@ -2,7 +2,7 @@ var crypto = require('crypto');
 var fs = require('fs');
 const readline = require('readline');
 const { callbackify } = require('util');
-const uuidv4 = require("uuid/v4")
+const uuid = require("uuid")
 
 function find_attr(item, value){
     if(value === 'name')value = 0;
@@ -26,7 +26,7 @@ function create_acc(name, pass, email){
     var l = find_attr(name, 'name');
     var m = find_attr(email, 'email');
     if(m == -1 && l == -1){
-        var temo = uuidv4();
+        var temo = uuid.v4();
         var item = [name, pass, email,  temo]
         salt = crypto.randomBytes(16).toString('hex');
         item.push(salt);
@@ -79,7 +79,7 @@ function find_token_by_name(token){
 }
 
 function create_token(name){
-    var tmp = uuidv4();
+    var tmp = uuid.v4();
     var item = tmp +' ' +(Date.now()+1800000).toString() + ' ' + name;
     fs.appendFile('login_tokens.txt', '\n' + item, function (err) {
         if (err) throw err;
