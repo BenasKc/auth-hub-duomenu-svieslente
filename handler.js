@@ -40,7 +40,8 @@ const server = http.createServer((req,res)=>{
           })
     }
     else{
-
+        res.writeHead(200, {'Content-Type':'text/plain'});
+        res.write("????");
         res.end();
     }
     
