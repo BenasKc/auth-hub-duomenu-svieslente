@@ -3,32 +3,47 @@ const fs = require("fs");
 const parser = require('./parser.js')
 const { url } = require("inspector");
 
-function sendFile(filename, contentType, res, callback){
-    fs.readFile(filename, (err,data) => {
-        if(err){
-            console.log(err);
-            res.write(err);
-            return;
-        }
-        else{
-            res.writeHead(200, {'Content-Type':contentType});
-            res.write(data);      
-        }
-        res.end();
-        if(callback){
-            callback(error);
-        }
-    });
-}
 const server = http.createServer((req,res)=>{
     if(req.url === '/create'){
-       
+        var status;
+        req.on('data', chunk => {
+            var item = chunk.toString().split('|');
+            status = parser.create_acc(item[0], item[1], item[2])
+            res.writeHead(200, {'Content-Type':'text/plain'});
+            res.write(JSON.stringify(status));
+            res.end();
+          })
     }
-    if(req.url == '/secret'){
+    else if(req.url === '/checklogin'){
+        var status;
+        req.on('data', chunk => {
+            var item = chunk.toString().split('|');
+            status = parser.check_login(item[0], item[1], 'name')
+            res.writeHead(200, {'Content-Type':'text/plain'});
+            res.write(JSON.stringify(status));
+            res.end();
+          })
+          
+     }
+    else if(req.url == '/secret'){
         res.write("You found it!");
         res.end();
     }
+    else if(req.url == '/check_token'){
+        var status;
+        req.on('data', chunk => {
+            var item = chunk.toString();
+            status = parser.find_token(item);
+            res.writeHead(200, {'Content-Type':'text/plain'});
+            res.write(JSON.stringify(status));
+            res.end();
+          })
+    }
+    else{
+
+        res.end();
+    }
     
     
     
-}).listen(8080);
+}).listen(1300);
