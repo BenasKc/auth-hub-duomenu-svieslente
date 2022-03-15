@@ -8,9 +8,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "handler.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "handler.js"
   },
-  "author": "BenasKc",
-  "license": "ISC",
-  
+  "author": "",
+  "license": "ISC"
 }
