@@ -2,6 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const parser = require('./parser.js')
 const { url } = require("inspector");
+var port = process.env.PORT || 80
 
 const server = http.createServer((req,res)=>{
     if(req.url === '/create'){
@@ -47,4 +48,4 @@ const server = http.createServer((req,res)=>{
     
     
     
-}).listen(80);
+}).listen(port);
