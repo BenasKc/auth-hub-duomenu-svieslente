@@ -23,7 +23,8 @@ function find_attr(item, value){
     
 }
 function create_acc(name, pass, email){
-    if(name.length < 1 || pass.length < 1)return '-1';
+    if(name.length < 1 || pass.length < 1)return '????????';
+    console.log(name + ' ' +    pass )
     var l = find_attr(name, 'name');
     var m = find_attr(email, 'email');
     if(m == -1 && l == -1){
