@@ -35,9 +35,7 @@ const server = http.createServer((req,res)=>{
         req.on('data', chunk => {
             
             var item = chunk.toString();
-            console.log(item)
             status = parser.find_token(item);
-            console.log(status)
             res.writeHead(200, {'Content-Type':'text/plain'});
             res.write(JSON.stringify(status));
             res.end();
