@@ -23,6 +23,7 @@ function find_attr(item, value){
     
 }
 function create_acc(name, pass, email){
+    if(name.length < 1 || pass.length < 1)return '-1';
     var l = find_attr(name, 'name');
     var m = find_attr(email, 'email');
     if(m == -1 && l == -1){
@@ -87,7 +88,7 @@ function create_token(name){
       return tmp;
 }
 function check_login(name, pass, option){
-
+    if(name.length < 1 || pass.length < 1)return '-1';
     var l = find_attr(name, option);
     if(l == -1)return '-1';
     var obj = find_attr(name, 'name');
