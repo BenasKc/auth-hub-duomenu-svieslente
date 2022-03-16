@@ -33,9 +33,11 @@ const server = http.createServer((req,res)=>{
     else if(req.url == '/check_token'){
         var status;
         req.on('data', chunk => {
-            console.log("UP")
+            
             var item = chunk.toString();
+            console.log(item)
             status = parser.find_token(item);
+            console.log(status)
             res.writeHead(200, {'Content-Type':'text/plain'});
             res.write(JSON.stringify(status));
             res.end();
