@@ -19,19 +19,17 @@ function find_attr(item, value){
         if(temp[value] == item)return temp;
     }
     return -1;
-
-    
 }
-function create_acc(name, pass, email){
+function create_acc(name, pass, email, first_n, last_n){
     if(name.length < 1 || pass.length < 1 || name === 'null' || pass === 'null')return '????????';
     var l = find_attr(name, 'name');
     var m = find_attr(email, 'email');
     if(m == -1 && l == -1){
         var temo = uuid.v4();
-        var item = [name, pass, email,  temo]
+        var item = [name, pass, email, first_n, last_n, temo]
         salt = crypto.randomBytes(16).toString('hex');
         item.push(salt);
-        item[1] = crypto.pbkdf2Sync(item[1], item[4],  
+        item[1] = crypto.pbkdf2Sync(item[1], item[6],  
             1000, 64, `sha512`).toString(`hex`);
         fs.appendFile('database_file.txt', '\n' + item.join('|'), function (err) {
             if (err) throw err;
@@ -44,7 +42,33 @@ function create_acc(name, pass, email){
         else return 'Email taken';
     }
 }
-
+function fetch_profile(id){
+    var itm = check_id(id);
+    if(itm[0] === '-1') return 'Nerasta';
+    else{
+        var data = fs.readFileSync('database_file.txt', 'utf8');
+        data = data.split('\n');
+        var personal_Data=[];
+        for(var i = 0;i < data.length;i++){
+            var temp = data[i].split('|');
+            var valid = false;
+            for(var j = 0;j < temp.length; j++){
+                if(itm[3] === temp[5]){
+                    if(j == 2 || j == 3 || j == 4){
+                        personal_Data.push(temp[j]);
+                    }
+                    valid = true;
+                }
+                
+            }
+            if(valid){ 
+                break;
+            }
+            
+        }
+        return personal_Data.join('|');
+    }
+}
 function find_token(token){
     var data = fs.readFileSync('login_tokens.txt', 'utf8');
     data = data.split('\n');
@@ -54,6 +78,22 @@ function find_token(token){
             if(temp[0].toString() == token.toString() ){
                 if(Date.now() < +temp[1]){
                     return temp[0];
+                }
+            }  
+        }
+    }
+    return '-1';
+
+}
+function check_id(token){
+    var data = fs.readFileSync('login_tokens.txt', 'utf8');
+    data = data.split('\n');
+    for(var i = 0;i < data.length;i++){
+        var temp = data[i].split(' ');
+        if(temp[0].length > 0){
+            if(temp[0].toString() == token.toString() ){
+                if(Date.now() < +temp[1]){
+                    return temp;
                 }
             }  
         }
@@ -76,12 +116,13 @@ function find_token_by_name(token){
         
     }
     return '-1';
-
 }
 
 function create_token(name){
     var tmp = uuid.v4();
-    var item = tmp +' ' +(Date.now()+1800000).toString() + ' ' + name;
+    var x = find_attr(name, 'name');
+
+    var item = tmp +' ' +(Date.now()+1800000).toString() + ' ' + name +' '+x[5];
     fs.appendFile('login_tokens.txt', '\n' + item, function (err) {
         if (err) throw err;
       });
@@ -98,7 +139,7 @@ function check_login(name, pass, option){
     else if(option === 'email')option = 2;
     else if(option === 'id')option = 3;
     var hash = crypto.pbkdf2Sync(pass,  
-        l[4], 1000, 64, `sha512`).toString(`hex`);
+        l[6], 1000, 64, `sha512`).toString(`hex`);
     if(l[1] === hash && status === '-1'){
         var tok = create_token(name);
         return tok;
@@ -109,3 +150,4 @@ function check_login(name, pass, option){
 exports.check_login = check_login;
 exports.create_acc = create_acc;
 exports.find_token = find_token;
+exports.fetch_profile = fetch_profile;

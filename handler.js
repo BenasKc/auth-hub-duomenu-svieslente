@@ -2,14 +2,14 @@ const http = require("http");
 const fs = require("fs");
 const parser = require('./parser.js')
 const { url } = require("inspector");
-const port = process.env.PORT || 5000
+const port = 8000//process.env.PORT || 5000
 
 const server = http.createServer((req,res)=>{
     if(req.url === '/create'){
         var status;
         req.on('data', chunk => {
             var item = chunk.toString().split('|');
-            status = parser.create_acc(item[0], item[1], item[2])
+            status = parser.create_acc(item[0], item[1], item[2], item[3], item[4])
             res.writeHead(200, {'Content-Type':'text/plain'});
             res.write(JSON.stringify(status));
             res.end();
@@ -25,7 +25,18 @@ const server = http.createServer((req,res)=>{
             res.end();
           })
           
-     }
+    }
+    else if(req.url === '/fetchprofile'){
+        var status;
+        req.on('data', chunk => {
+            var item = chunk.toString().split('|');
+            status = parser.fetch_profile(item[0].replace('"', '').replace('"', '')); // id
+            res.writeHead(200, {'Content-Type':'text/plain'});
+            res.write(JSON.stringify(status));
+            res.end();
+          })
+          
+    }
     else if(req.url == '/secret'){
         res.write("You found it!");
         res.end();
