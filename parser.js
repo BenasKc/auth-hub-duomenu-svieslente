@@ -1,150 +1,149 @@
-var crypto = require('crypto'); 
+var crypto = require('crypto');
 var fs = require('fs');
 const readline = require('readline');
 const { callbackify } = require('util');
 const uuid = require("uuid")
 
-function find_attr(item, value){
-    if(value === 'name')value = 0;
-    else if(value === 'hash')value = 1;
-    else if(value === 'email')value = 2;
-    else if(value === 'id')value = 3;
-    
+function find_attr(item, value) {
+    if (value === 'name') value = 0;
+    else if (value === 'hash') value = 1;
+    else if (value === 'email') value = 2;
+    else if (value === 'id') value = 3;
+
     var data = fs.readFileSync('database_file.txt', 'utf8');
 
     data = data.split('\n');
 
-    for(var i = 0;i < data.length;i++){
+    for (var i = 0; i < data.length; i++) {
         var temp = data[i].split('|');
-        if(temp[value] == item)return temp;
+        if (temp[value] == item) return temp;
     }
     return -1;
 }
-function create_acc(name, pass, email, first_n, last_n){
-    if(name.length < 1 || pass.length < 1 || name === 'null' || pass === 'null')return '????????';
+function create_acc(name, pass, email, first_n, last_n) {
+    if (!(name && pass && email && first_n && last_n)) return 'Enter all data legitimately';
     var l = find_attr(name, 'name');
     var m = find_attr(email, 'email');
-    if(m == -1 && l == -1){
+    if (m == -1 && l == -1) {
         var temo = uuid.v4();
         var item = [name, pass, email, first_n, last_n, temo]
         salt = crypto.randomBytes(16).toString('hex');
         item.push(salt);
-        item[1] = crypto.pbkdf2Sync(item[1], item[6],  
+        item[1] = crypto.pbkdf2Sync(item[1], item[6],
             1000, 64, `sha512`).toString(`hex`);
         fs.appendFile('database_file.txt', '\n' + item.join('|'), function (err) {
             if (err) throw err;
-            
-          });
-          return 'Created';
-        }
-    else{
-        if(l != -1)return 'Name taken';
+
+        });
+        return 'Created';
+    }
+    else {
+        if (l != -1) return 'Name taken';
         else return 'Email taken';
     }
 }
-function fetch_profile(id){
+function fetch_profile(id) {
     var itm = check_id(id);
-    if(itm[0] === '-1') return 'Nerasta';
-    else{
+    if (itm[0] === '-1') return 'Nerasta';
+    else {
         var data = fs.readFileSync('database_file.txt', 'utf8');
         data = data.split('\n');
-        var personal_Data=[];
-        for(var i = 0;i < data.length;i++){
+        var personal_Data = [];
+        for (var i = 0; i < data.length; i++) {
             var temp = data[i].split('|');
             var valid = false;
-            for(var j = 0;j < temp.length; j++){
-                if(itm[3] === temp[5]){
-                    if(j == 2 || j == 3 || j == 4){
+            for (var j = 0; j < temp.length; j++) {
+                if (itm[3] === temp[5]) {
+                    if (j == 2 || j == 3 || j == 4) {
                         personal_Data.push(temp[j]);
                     }
                     valid = true;
                 }
-                
+
             }
-            if(valid){ 
+            if (valid) {
                 break;
             }
-            
+
         }
         return personal_Data.join('|');
     }
 }
-function find_token(token){
+function find_token(token) {
     var data = fs.readFileSync('login_tokens.txt', 'utf8');
     data = data.split('\n');
-    for(var i = 0;i < data.length;i++){
+    for (var i = 0; i < data.length; i++) {
         var temp = data[i].split(' ');
-        if(temp[0].length > 0){
-            if(temp[0].toString() == token.toString() ){
-                if(Date.now() < +temp[1]){
+        if (temp[0].length > 0) {
+            if (temp[0].toString() == token.toString()) {
+                if (Date.now() < +temp[1]) {
                     return temp[0];
                 }
-            }  
+            }
         }
     }
     return '-1';
-
 }
-function check_id(token){
+function check_id(token) {
     var data = fs.readFileSync('login_tokens.txt', 'utf8');
     data = data.split('\n');
-    for(var i = 0;i < data.length;i++){
+    for (var i = 0; i < data.length; i++) {
         var temp = data[i].split(' ');
-        if(temp[0].length > 0){
-            if(temp[0].toString() == token.toString() ){
-                if(Date.now() < +temp[1]){
+        if (temp[0].length > 0) {
+            if (temp[0].toString() == token.toString()) {
+                if (Date.now() < +temp[1]) {
                     return temp;
                 }
-            }  
+            }
         }
     }
     return '-1';
 
 }
-function find_token_by_name(token){
+function find_token_by_name(token) {
     var data = fs.readFileSync('login_tokens.txt', 'utf8');
     data = data.split('\n');
-    for(var i = 0;i < data.length;i++){
+    for (var i = 0; i < data.length; i++) {
         var temp = data[i].split(' ');
-        if(temp[0].length > 0){
-            if(temp[2].toString() == token.toString() ){
-                if(Date.now() < +temp[1]){
+        if (temp[0].length > 0) {
+            if (temp[2].toString() == token.toString()) {
+                if (Date.now() < +temp[1]) {
                     return temp[0];
                 }
-            }  
+            }
         }
-        
+
     }
     return '-1';
 }
 
-function create_token(name){
+function create_token(name) {
     var tmp = uuid.v4();
     var x = find_attr(name, 'name');
 
-    var item = tmp +' ' +(Date.now()+1800000).toString() + ' ' + name +' '+x[5];
+    var item = tmp + ' ' + (Date.now() + 1800000).toString() + ' ' + name + ' ' + x[5];
     fs.appendFile('login_tokens.txt', '\n' + item, function (err) {
         if (err) throw err;
-      });
-      return tmp;
+    });
+    return tmp;
 }
-function check_login(name, pass, option){
-    if(name.length < 1 || pass.length < 1 || name === 'null' || pass === 'null')return '-1';
+function check_login(name, pass, option) {
+    if (name.length < 1 || pass.length < 1 || name === 'null' || pass === 'null') return '-1';
     var l = find_attr(name, option);
-    if(l == -1)return '-1';
+    if (l == -1) return '-1';
     var obj = find_attr(name, 'name');
     var status = find_token_by_name(name, 'name');
-    if(option === 'name')option = 0;
-    else if(option === 'hash')option = 1;
-    else if(option === 'email')option = 2;
-    else if(option === 'id')option = 3;
-    var hash = crypto.pbkdf2Sync(pass,  
+    if (option === 'name') option = 0;
+    else if (option === 'hash') option = 1;
+    else if (option === 'email') option = 2;
+    else if (option === 'id') option = 3;
+    var hash = crypto.pbkdf2Sync(pass,
         l[6], 1000, 64, `sha512`).toString(`hex`);
-    if(l[1] === hash && status === '-1'){
+    if (l[1] === hash && status === '-1') {
         var tok = create_token(name);
         return tok;
     }
-    else if(l[1] === hash)return status;
+    else if (l[1] === hash) return status;
     return -1;
 }
 exports.check_login = check_login;
