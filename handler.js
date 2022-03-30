@@ -43,6 +43,9 @@ const server = http.createServer((req,res)=>{
     }
     else if(req.url == '/check_token'){
         var status;
+        //console.log(req.headers['x-forwarded-for'] ||
+        //    req.socket.remoteAddress ||
+         //   null);
         req.on('data', chunk => {
             
             var item = chunk.toString();
