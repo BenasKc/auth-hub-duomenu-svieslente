@@ -37,6 +37,17 @@ const server = http.createServer((req,res)=>{
           })
           
     }
+    // else if(req.url === '/create_chart'){
+    //     var status;
+    //     req.on('data', chunk => {
+    //         var item = JSON.parse(chunk.toString());
+    //         status = parser.create_chr(item.name, item.pass, item); // name, pass, data
+    //         res.writeHead(200, {'Content-Type':'text/plain'});
+    //         res.write(JSON.stringify(status));
+    //         res.end();
+    //       })
+          
+    // }
     else if(req.url == '/secret'){
         res.write("You found it!");
         res.end();

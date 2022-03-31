@@ -3,7 +3,7 @@ var fs = require('fs');
 const readline = require('readline');
 const { callbackify } = require('util');
 const uuid = require("uuid")
-
+const chart_acq = require('./chart_acq.js')
 function find_attr(item, value) {
     if (value === 'name') value = 0;
     else if (value === 'hash') value = 1;
@@ -31,10 +31,12 @@ function create_acc(name, pass, email, first_n, last_n) {
         item.push(salt);
         item[1] = crypto.pbkdf2Sync(item[1], item[6],
             1000, 64, `sha512`).toString(`hex`);
+        chart_acq.create_chart_folder(item[0]);
         fs.appendFile('database_file.txt', '\n' + item.join('|'), function (err) {
             if (err) throw err;
 
         });
+        
         return 'Created';
     }
     else {
@@ -146,7 +148,17 @@ function check_login(name, pass, option) {
     else if (l[1] === hash) return status;
     return -1;
 }
+function create_chr(name, pass, data){
+    var status = check_login(name, pass, 'name');
+    if(status != -1){
+        chart_acq.create_chart(name, data);
+        return 'Created';
+    }
+    return 'Invalid login';
+
+}
 exports.check_login = check_login;
 exports.create_acc = create_acc;
 exports.find_token = find_token;
 exports.fetch_profile = fetch_profile;
+exports.create_chr = create_chr;
