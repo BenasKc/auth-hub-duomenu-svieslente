@@ -30,24 +30,26 @@ const server = http.createServer((req,res)=>{
         var status;
         req.on('data', chunk => {
             var item = chunk.toString().split('|');
-            status = parser.fetch_profile(item[0].replace('"', '').replace('"', '')); // id
+            status = parser.fetch_profile(item[0].slice(1, -1)); // id
             res.writeHead(200, {'Content-Type':'text/plain'});
             res.write(JSON.stringify(status));
             res.end();
           })
           
     }
-    // else if(req.url === '/create_chart'){
-    //     var status;
-    //     req.on('data', chunk => {
-    //         var item = JSON.parse(chunk.toString());
-    //         status = parser.create_chr(item.name, item.pass, item); // name, pass, data
-    //         res.writeHead(200, {'Content-Type':'text/plain'});
-    //         res.write(JSON.stringify(status));
-    //         res.end();
-    //       })
+    else if(req.url === '/create_chart'){
+        var status;
+        req.on('data', chunk => {
+            var object = JSON.parse(chunk.toString());
+            status = parser.create_chr(object, (cb)=>{
+                res.writeHead(200, {'Content-Type':'text/plain'});
+                res.write(JSON.stringify(cb));
+                res.end();
+            }); //  data
+            
+          })
           
-    // }
+    }
     else if(req.url == '/secret'){
         res.write("You found it!");
         res.end();
@@ -61,6 +63,20 @@ const server = http.createServer((req,res)=>{
             
             var item = chunk.toString();
             status = parser.find_token(item);
+            res.writeHead(200, {'Content-Type':'text/plain'});
+            res.write(JSON.stringify(status));
+            res.end();
+          })
+    }
+    else if(req.url == '/get_charts'){
+        var status;
+        //console.log(req.headers['x-forwarded-for'] ||
+        //    req.socket.remoteAddress ||
+         //   null);
+        req.on('data', chunk => { // id must be sent
+            
+            var item = chunk.toString();
+            var status = parser.get_charts(item);
             res.writeHead(200, {'Content-Type':'text/plain'});
             res.write(JSON.stringify(status));
             res.end();

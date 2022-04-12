@@ -50,14 +50,16 @@ function fetch_profile(id) {
     else {
         var data = fs.readFileSync('database_file.txt', 'utf8');
         data = data.split('\n');
-        var personal_Data = [];
+        var personal_Data ; // sutvarkyti json objekto valdyma
         for (var i = 0; i < data.length; i++) {
             var temp = data[i].split('|');
             var valid = false;
             for (var j = 0; j < temp.length; j++) {
                 if (itm[3] === temp[5]) {
-                    if (j == 2 || j == 3 || j == 4) {
-                        personal_Data.push(temp[j]);
+                    if (j == 2 || j == 3 || j == 4) { //email, fname, lname
+                        if(j === 2)personal_Data.email = temp[2];
+                        else if(j === 3)personal_Data.firstName = temp[3];
+                        else if(j === 4)personal_Data.lastName = temp[4];
                     }
                     valid = true;
                 }
@@ -68,7 +70,7 @@ function fetch_profile(id) {
             }
 
         }
-        return personal_Data.join('|');
+        return JSON.stringify(personal_Data);
     }
 }
 function find_token(token) {
@@ -122,7 +124,6 @@ function find_token_by_name(token) {
 function create_token(name) {
     var tmp = uuid.v4();
     var x = find_attr(name, 'name');
-
     var item = tmp + ' ' + (Date.now() + 1800000).toString() + ' ' + name + ' ' + x[5];
     fs.appendFile('login_tokens.txt', '\n' + item, function (err) {
         if (err) throw err;
@@ -148,17 +149,33 @@ function check_login(name, pass, option) {
     else if (l[1] === hash) return status;
     return -1;
 }
-function create_chr(name, pass, data){
-    var status = check_login(name, pass, 'name');
-    if(status != -1){
-        chart_acq.create_chart(name, data);
-        return 'Created';
+function create_chr(data, cb){
+    var status = check_id(data.id);
+    if(status === '-1'){
+        cb("Invalid ID");
     }
-    return 'Invalid login';
+    else{
+        chart_acq.create_chart(status[2], data, (result)=>{
+            cb(result);
+        });
+    }
+    //var status = check_login(name, pass, 'name');
+    //if(status != -1){
+      //  chart_acq.create_chart(name, data);
+       // return 'Created';
+   // }
 
+}
+function get_charts(id, cb){
+    chart_acq.fetch_charts(username, (filename, content)=>{
+        var data = {};
+        data[filename] = content;
+        cb(data);
+    })
 }
 exports.check_login = check_login;
 exports.create_acc = create_acc;
 exports.find_token = find_token;
 exports.fetch_profile = fetch_profile;
 exports.create_chr = create_chr;
+exports.get_charts = get_charts;
