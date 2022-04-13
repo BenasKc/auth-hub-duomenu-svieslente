@@ -50,7 +50,7 @@ function fetch_profile(id) {
     else {
         var data = fs.readFileSync('database_file.txt', 'utf8');
         data = data.split('\n');
-        var personal_Data ; // sutvarkyti json objekto valdyma
+        var personal_Data = {}; // sutvarkyti json objekto valdyma
         for (var i = 0; i < data.length; i++) {
             var temp = data[i].split('|');
             var valid = false;
