@@ -56,7 +56,6 @@ function fetch_profile(id) {
             var valid = false;
             for (var j = 0; j < temp.length; j++) {
 
-                console.log(id)
                 if (itm[3] === temp[5]) {
                     if (j == 2 || j == 3 || j == 4) { //email, fname, lname
                         if(j === 2)personal_Data.email = temp[2];
@@ -108,12 +107,12 @@ function check_id(token) {
 }
 function find_token_by_name(token) {
     var data = fs.readFileSync('login_tokens.txt', 'utf8');
-    data = data.split('\n');
+    data = data.split('\r\n');
     for (var i = 0; i < data.length; i++) {
-        var temp = data[i].split(' ');
-        if (temp[0].length > 0) {
-            if (temp[2].toString() == token.toString()) {
-                if (Date.now() < +temp[1]) {
+        var temp = data[i].split(' '); 
+        if (temp[0].length > 0 && temp.length > 3) {                                
+            if (temp[2].toString() == token.toString()) { 
+                if (Date.now() < +temp[1]) {  
                     return temp[0];
                 }
             }
@@ -132,9 +131,9 @@ function create_token(name) {
     });
     return tmp;
 }
-function check_login(name, pass, option) {
+function check_login(name, pass, option) { 
     if (name.length < 1 || pass.length < 1 || name === 'null' || pass === 'null') return '-1';
-    var l = find_attr(name, option);
+    var l = find_attr(name, option);        
     if (l == -1) return '-1';
     var obj = find_attr(name, 'name');
     var status = find_token_by_name(name, 'name');
@@ -142,6 +141,7 @@ function check_login(name, pass, option) {
     else if (option === 'hash') option = 1;
     else if (option === 'email') option = 2;
     else if (option === 'id') option = 3;
+    l[6] = l[6].replace(/(\r\n|\n|\r)/gm, "");
     var hash = crypto.pbkdf2Sync(pass,
         l[6], 1000, 64, `sha512`).toString(`hex`);
     if (l[1] === hash && status === '-1') {
