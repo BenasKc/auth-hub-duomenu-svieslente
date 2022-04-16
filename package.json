@@ -5,6 +5,7 @@
   "main": "handler.js",
   "dependencies": {
     "crypto": "^1.0.1",
+    "mysql": "^2.18.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {},
