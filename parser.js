@@ -55,8 +55,6 @@ function fetch_profile(id) {
             var temp = data[i].split('|');
             var valid = false;
             for (var j = 0; j < temp.length; j++) {
-
-                console.log(id)
                 if (itm[3] === temp[5]) {
                     if (j == 2 || j == 3 || j == 4) { //email, fname, lname
                         if(j === 2)personal_Data.email = temp[2];
@@ -111,7 +109,7 @@ function find_token_by_name(token) {
     data = data.split('\r\n');
     for (var i = 0; i < data.length; i++) {
         var temp = data[i].split(' ');
-        if (temp[0].length > 0) { console.log(temp)
+        if (temp[0].length > 0) { 
             if (temp[2].toString() == token.toString()) {
                 if (Date.now() < +temp[1]) {
                     return temp[0];
@@ -142,6 +140,7 @@ function check_login(name, pass, option) {
     else if (option === 'hash') option = 1;
     else if (option === 'email') option = 2;
     else if (option === 'id') option = 3;
+    l[6] = l[6].replace(/(\r\n|\n|\r)/gm, "");
     var hash = crypto.pbkdf2Sync(pass,
         l[6], 1000, 64, `sha512`).toString(`hex`);
     if (l[1] === hash && status === '-1') {
