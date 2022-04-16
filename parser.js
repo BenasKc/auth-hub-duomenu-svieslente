@@ -55,6 +55,8 @@ function fetch_profile(id) {
             var temp = data[i].split('|');
             var valid = false;
             for (var j = 0; j < temp.length; j++) {
+
+                console.log(id)
                 if (itm[3] === temp[5]) {
                     if (j == 2 || j == 3 || j == 4) { //email, fname, lname
                         if(j === 2)personal_Data.email = temp[2];
