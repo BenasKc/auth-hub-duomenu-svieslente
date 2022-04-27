@@ -24,7 +24,6 @@ const requestListener = function (req, res) {
             else{
                 connection.query(`CALL Duomenu_Svieslente.sp_Check_Login('${data_obj[0]}')`, function(error, result){
                     if(error) throw error;
-                    console.log("here" + result);
                     if(result && result[0].length === 0){
 
 
@@ -42,7 +41,6 @@ const requestListener = function (req, res) {
                             })
                         }
                         else{
-                            console.log('Incorrect login');
                             res.write('-1');
                             res.end();
                         }
@@ -54,7 +52,6 @@ const requestListener = function (req, res) {
     else if(req.url === '/check_token'){
         req.on('data', (chunk)=>{
                 if(chunk.toString().replace(/[^-\w\s]/gi, '').length > 0){
-                    console.log(chunk.toString().replace(/[^-\w\s]/gi, ''));
                     connection.query(`CALL Duomenu_Svieslente.sp_Check_Token('${chunk.toString().replace(/[^-\w\s]/gi, '')}')`, function(err, result){
                     if(err)throw err;
                     if(result[0][0].stat === 'true'){
