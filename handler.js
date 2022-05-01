@@ -16,8 +16,8 @@ const requestListener = function (req, res) {
         req.on('data', (chunk)=>{
             
             var data_obj = JSON.parse(chunk.toString());
-            data_obj[0] = data_obj[0].replace(/[^\w\s]/gi, '');
-            data_obj[1] = data_obj[1].replace(/[^\w\s]/gi, '');
+            data_obj[0] = data_obj[0].replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+            data_obj[1] = data_obj[1].replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
 
 
             if(data_obj[0].length > 63)res.end("Too long username");
@@ -51,8 +51,8 @@ const requestListener = function (req, res) {
     }
     else if(req.url === '/check_token'){
         req.on('data', (chunk)=>{
-                if(chunk.toString().replace(/[^-\w\s]/gi, '').length > 0){
-                    connection.query(`CALL Duomenu_Svieslente.sp_Check_Token('${chunk.toString().replace(/[^-\w\s]/gi, '')}')`, function(err, result){
+                if(chunk.toString().replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '').length > 0){
+                    connection.query(`CALL Duomenu_Svieslente.sp_Check_Token('${chunk.toString().replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')}')`, function(err, result){
                     if(err)throw err;
                     if(result[0][0].stat === 'true'){
                         res.write('true');
@@ -79,6 +79,22 @@ const requestListener = function (req, res) {
                 if(err) throw err;
                 res.write(result[0][0].stat);
                 res.end();
+            })
+        })
+    }
+    else if(req.url === '/fetchprofile'){
+        req.on('data', (chunk)=>{
+            connection.query(`CALL Duomenu_Svieslente.sp_Fetch_Profile('${(chunk).toString().replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')}')`, function(er, resv){
+                if(er) throw er;
+                res.end(JSON.stringify([resv[0][0].Name_of_Organisation, resv[0][0].Username]));
+            })
+        })
+    }
+    else if(req.url === '/fetch_charts'){
+        req.on('data', (chunk)=>{
+            connection.query(`CALL Duomenu_Svieslente.sp_Fetch_Charts('${(chunk).toString().replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '')}')`, function(er, resv){
+                if(er) throw er;
+                res.end(JSON.stringify(resv[0]));
             })
         })
     }
