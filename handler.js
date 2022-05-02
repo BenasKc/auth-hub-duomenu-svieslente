@@ -98,6 +98,18 @@ const requestListener = function (req, res) {
             })
         })
     }
+    else if(req.url === '/save_pref'){
+        req.on('data', (chunk)=>{
+            var duom = JSON.parse(chunk.toString());
+            duom.session = duom.session.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+            duom.id = duom.id.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+            duom.conf = duom.conf.replace(/[`~!@#$%^&*()_|+\=?;:'",.<>\{\}\[\]\\\/]/gi, '');
+            connection.query(`CALL Duomenu_Svieslente.sp_Save_Preference('${duom.session}', '${duom.id}', '{"selected_graph": "${duom.conf}"}')`, function(er, resv){
+                if(er) throw er;
+                res.end(JSON.stringify(resv[0]));
+            })
+        })
+    }
     else res.end();
 };
 const server = http.createServer(requestListener);
