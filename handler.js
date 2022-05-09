@@ -110,6 +110,20 @@ const requestListener = function (req, res) {
             })
         })
     }
+    else if(req.url === '/send_chart'){
+
+        req.on('data', (chunk)=>{
+            var datas = JSON.parse(chunk.toString())
+            if(datas.data.title !== undefined){
+                connection.query(`CALL Duomenu_Svieslente.sp_Insert_Chart('${datas.data.title}','${JSON.stringify(datas.data)}', '{"selected_graph": "Line"}', '${datas.ses}')`, function(err, result){
+                if(err) throw err;
+                res.end('Action performed')
+                })
+            }
+            else res.end('Error');
+            
+        })
+    }
     else res.end();
 };
 const server = http.createServer(requestListener);
